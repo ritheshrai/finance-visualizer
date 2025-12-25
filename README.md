@@ -1,12 +1,14 @@
-# FinViz - Personal Finance Visualizer
+# ExpenseCheck
 
-A modern, privacy-focused personal finance dashboard built with React, TypeScript, and Tailwind CSS. visualizing your expenses and income with beautiful interactive charts.
+A modern, privacy-focused personal finance dashboard tailored for Indian users, built with React, TypeScript, and Tailwind CSS.
 
 ## Features
 
-- 📊 **Interactive Dashboard**: Visualize your financial health with income/expense bars and category breakdowns.
-- 🌙 **Dark Mode UI**: Sleek, eye-friendly dark interface using Tailwind CSS.
-- 📄 **Google Pay Support**: Import transactions directly from your Google Pay monthly statement PDFs (Beta).
+- 📊 **Interactive Trading-Style Dashboard**: Visualize your financial health with interactive area charts and category breakdowns.
+- 🇮🇳 **Indian Context**: Native support for Indian Rupee (₹) formatting and FY 2024-25 Tax estimation.
+- 🧮 **Tax Estimator**: Built-in calculator to estimate tax liability based on the New Tax Regime.
+- 🌙 **Modern Glassmorphism UI**: Sleek, dark-themed interface with smooth animations.
+- 📄 **Google Pay Support**: Import transactions directly from your Google Pay monthly statement PDFs.
 - ✍️ **Manual Entry**: Easily add custom transactions for cash or other sources.
 - 💾 **Local Storage**: Data persists in your browser - no external database, full privacy.
 - 📤 **Data Management**: Export and Import your data as JSON for backup or migration.
@@ -16,11 +18,12 @@ A modern, privacy-focused personal finance dashboard built with React, TypeScrip
 
 - **Framework**: React 18 + Vite
 - **Language**: TypeScript
-- **Styling**: Tailwind CSS 3
+- **Styling**: Tailwind CSS 3 (Glassmorphism design)
+- **Animations**: Framer Motion
 - **Charts**: Recharts
 - **Icons**: Lucide React
 - **PDF Parsing**: PDF.js
-- **Routing**: React Router (HashRouter for GitHub Pages compatibility)
+- **Routing**: React Router (HashRouter)
 
 ## Getting Started
 
@@ -33,8 +36,8 @@ A modern, privacy-focused personal finance dashboard built with React, TypeScrip
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/finance-visualizer.git
-   cd finance-visualizer
+   git clone https://github.com/yourusername/expense-check.git
+   cd expense-check
    ```
 
 2. Install dependencies:
@@ -56,7 +59,7 @@ This project is pre-configured for deployment to GitHub Pages.
    npm run build
    ```
 
-2. Deploy the `dist` folder to your `gh-pages` branch. You can use the `gh-pages` package or manually push the contents of `dist`.
+2. Deploy the `dist` folder to your `gh-pages` branch.
 
    **Manual method:**
    ```bash

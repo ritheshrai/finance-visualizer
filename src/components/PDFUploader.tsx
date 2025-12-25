@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Upload, FileText, Loader2, AlertCircle } from 'lucide-react';
+import { Upload, FileText, Loader2, AlertCircle, X, ShieldCheck } from 'lucide-react';
 import { parseGooglePayPDF } from '../utils/pdfParser';
 import { useTransactions } from '../context/TransactionContext';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const PDFUploader: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const { addTransactions } = useTransactions();
@@ -47,62 +48,90 @@ const PDFUploader: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-      <div className="w-full max-w-md bg-dark-card border border-slate-700 rounded-xl shadow-2xl p-6">
-        <div className="text-center">
-          <div className="mx-auto w-12 h-12 bg-blue-500/10 text-blue-400 rounded-full flex items-center justify-center mb-4">
-            <Upload size={24} />
-          </div>
-          <h3 className="text-xl font-bold text-white mb-2">Upload Google Pay PDF</h3>
-          <p className="text-slate-400 text-sm mb-6">
-            Upload your monthly statement to automatically import transactions.
-          </p>
-
-          <label className="block w-full cursor-pointer">
-            <div className="w-full border-2 border-dashed border-slate-700 hover:border-blue-500 rounded-xl p-8 transition-colors group">
-              {loading ? (
-                <div className="flex flex-col items-center gap-2">
-                  <Loader2 className="animate-spin text-blue-500" size={32} />
-                  <span className="text-slate-400">Parsing PDF...</span>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center gap-2">
-                  <FileText className="text-slate-500 group-hover:text-blue-400 transition-colors" size={32} />
-                  <span className="text-slate-300 font-medium group-hover:text-white transition-colors">
-                    Click to browse
-                  </span>
-                  <span className="text-xs text-slate-500">PDF files only</span>
-                </div>
-              )}
-            </div>
-            <input 
-              type="file" 
-              accept=".pdf" 
-              className="hidden" 
-              onChange={handleFileUpload}
-              disabled={loading}
-            />
-          </label>
-
-          {error && (
-            <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center gap-2 text-red-400 text-sm text-left">
-              <AlertCircle size={16} className="shrink-0" />
-              {error}
-            </div>
-          )}
-
-          <div className="mt-6 flex justify-end">
+    <AnimatePresence>
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+          className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        />
+        
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 20 }}
+          className="relative w-full max-w-md bg-[#151921] border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b border-white/5 bg-white/[0.02]">
+            <h3 className="text-xl font-bold text-white">Import Statement</h3>
             <button 
-              onClick={onClose}
-              className="text-slate-400 hover:text-white font-medium text-sm"
-              disabled={loading}
+              onClick={onClose} 
+              className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
             >
-              Cancel
+              <X size={20} />
             </button>
           </div>
-        </div>
+
+          <div className="p-8 text-center">
+            <div className="mx-auto w-16 h-16 bg-blue-500/10 text-blue-400 rounded-full flex items-center justify-center mb-6 shadow-lg shadow-blue-500/20">
+              <Upload size={32} />
+            </div>
+            
+            <h3 className="text-xl font-bold text-white mb-2">Upload Google Pay PDF</h3>
+            <p className="text-slate-400 text-sm mb-8 leading-relaxed">
+              Upload your monthly transaction statement to automatically import your expenses and income.
+            </p>
+
+            <label className="block w-full cursor-pointer">
+              <div className="w-full bg-[#0B0E14] border-2 border-dashed border-slate-700 hover:border-emerald-500 hover:bg-emerald-500/5 rounded-xl p-10 transition-all group relative overflow-hidden">
+                {loading ? (
+                  <div className="flex flex-col items-center gap-3">
+                    <Loader2 className="animate-spin text-emerald-500" size={36} />
+                    <span className="text-emerald-400 font-medium">Processing transactions...</span>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-3">
+                    <FileText className="text-slate-500 group-hover:text-emerald-400 transition-colors" size={36} />
+                    <div className="space-y-1">
+                      <p className="text-slate-300 font-medium group-hover:text-white transition-colors">
+                        Click to browse file
+                      </p>
+                      <p className="text-xs text-slate-500">Supports PDF format only</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <input 
+                type="file" 
+                accept=".pdf" 
+                className="hidden" 
+                onChange={handleFileUpload}
+                disabled={loading}
+              />
+            </label>
+
+            <div className="mt-6 flex items-center justify-center gap-2 text-xs text-slate-500 bg-white/5 py-2 px-4 rounded-full w-fit mx-auto">
+              <ShieldCheck size={14} className="text-emerald-500" />
+              <span>Processed locally. Your data never leaves this device.</span>
+            </div>
+
+            {error && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 text-red-400 text-sm text-left"
+              >
+                <AlertCircle size={20} className="shrink-0" />
+                <p>{error}</p>
+              </motion.div>
+            )}
+          </div>
+        </motion.div>
       </div>
-    </div>
+    </AnimatePresence>
   );
 };
 

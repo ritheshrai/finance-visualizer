@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { useTransactions } from '../context/TransactionContext';
-import { Download, Upload, Trash2, AlertTriangle } from 'lucide-react';
+import { Download, Upload, Trash2, AlertTriangle, Database, Info } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const Settings: React.FC = () => {
   const { transactions, addTransactions, clearTransactions } = useTransactions();
@@ -12,7 +13,7 @@ const Settings: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `finviz-export-${new Date().toISOString().split('T')[0]}.json`;
+    link.download = `expensecheck-export-${new Date().toISOString().split('T')[0]}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -29,7 +30,6 @@ const Settings: React.FC = () => {
         const content = e.target?.result as string;
         const importedData = JSON.parse(content);
         if (Array.isArray(importedData)) {
-          // Basic validation could go here
           addTransactions(importedData);
           alert('Data imported successfully!');
         } else {
@@ -53,32 +53,56 @@ const Settings: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-white">Settings</h2>
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="max-w-4xl mx-auto space-y-8"
+    >
+      <div>
+        <h2 className="text-3xl font-bold text-white mb-1">Settings</h2>
+        <p className="text-slate-400">Manage your data and application preferences</p>
+      </div>
       
-      <div className="p-6 rounded-xl bg-dark-card border border-slate-800">
-        <h3 className="text-lg font-bold text-white mb-4">Data Management</h3>
-        <p className="text-dark-muted mb-6">
-          Manage your transaction data. You can back up your data to a JSON file or restore it from a previous backup.
-        </p>
+      <div className="p-8 rounded-2xl bg-[#151921]/80 backdrop-blur-xl border border-white/5 shadow-xl">
+        <div className="flex items-start gap-4 mb-6">
+          <div className="p-3 rounded-xl bg-blue-500/10 text-blue-400">
+            <Database size={24} />
+          </div>
+          <div>
+            <h3 className="text-xl font-bold text-white">Data Management</h3>
+            <p className="text-slate-400 mt-1">
+              Your data is stored locally in your browser. You can export it for backup or transfer it to another device.
+            </p>
+          </div>
+        </div>
         
-        <div className="space-y-4">
-          <div className="flex flex-wrap gap-4">
-            <button 
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <motion.button 
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={handleExport}
-              className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors font-medium"
+              className="flex items-center justify-center gap-2 px-6 py-4 bg-[#0B0E14] hover:bg-[#1E232F] text-slate-300 hover:text-white border border-white/10 rounded-xl transition-all font-medium shadow-lg group"
             >
-              <Download size={18} />
-              Export Data
-            </button>
+              <Download size={20} className="text-emerald-400 group-hover:text-emerald-300" />
+              <div className="text-left">
+                <span className="block text-sm font-semibold text-white">Export Data</span>
+                <span className="text-xs text-slate-500">Download JSON backup</span>
+              </div>
+            </motion.button>
             
-            <button 
+            <motion.button 
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => fileInputRef.current?.click()}
-              className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors font-medium"
+              className="flex items-center justify-center gap-2 px-6 py-4 bg-[#0B0E14] hover:bg-[#1E232F] text-slate-300 hover:text-white border border-white/10 rounded-xl transition-all font-medium shadow-lg group"
             >
-              <Upload size={18} />
-              Import Data
-            </button>
+              <Upload size={20} className="text-blue-400 group-hover:text-blue-300" />
+              <div className="text-left">
+                <span className="block text-sm font-semibold text-white">Import Data</span>
+                <span className="text-xs text-slate-500">Restore from JSON file</span>
+              </div>
+            </motion.button>
             <input 
               type="file" 
               ref={fileInputRef}
@@ -88,30 +112,45 @@ const Settings: React.FC = () => {
             />
           </div>
 
-          <div className="pt-4 border-t border-slate-800">
-            <h4 className="text-red-400 font-medium mb-2 flex items-center gap-2">
-              <AlertTriangle size={18} />
-              Danger Zone
-            </h4>
-            <button 
-              onClick={handleClearData}
-              className="flex items-center gap-2 px-4 py-2 bg-red-900/20 hover:bg-red-900/40 text-red-400 border border-red-900/50 rounded-lg transition-colors font-medium"
-            >
-              <Trash2 size={18} />
-              Clear All Data
-            </button>
+          <div className="pt-6 border-t border-white/5">
+            <div className="p-4 rounded-xl bg-red-500/5 border border-red-500/10 flex items-center justify-between flex-wrap gap-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-red-500/10 text-red-400">
+                    <AlertTriangle size={20} />
+                </div>
+                <div>
+                    <h4 className="text-white font-medium">Danger Zone</h4>
+                    <p className="text-xs text-slate-400">Irreversible action</p>
+                </div>
+              </div>
+              <motion.button 
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleClearData}
+                className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-lg transition-colors font-medium text-sm"
+              >
+                <Trash2 size={16} />
+                Clear All Data
+              </motion.button>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="p-6 rounded-xl bg-dark-card border border-slate-800">
-        <h3 className="text-lg font-bold text-white mb-4">About</h3>
-        <div className="space-y-2 text-dark-muted">
-            <p>Finance Visualizer v1.0.0</p>
+      <div className="p-8 rounded-2xl bg-[#151921]/80 backdrop-blur-xl border border-white/5 shadow-xl">
+        <div className="flex items-center gap-3 mb-4">
+            <Info size={20} className="text-slate-400" />
+            <h3 className="text-lg font-bold text-white">About</h3>
+        </div>
+        <div className="space-y-2 text-slate-400 text-sm">
+            <p>ExpenseCheck v1.0.0</p>
             <p>Built with React, Vite, TailwindCSS, and Recharts.</p>
+            <p className="pt-2 text-slate-500">
+                Privacy Note: All data is stored locally on your device. No data is sent to any server.
+            </p>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

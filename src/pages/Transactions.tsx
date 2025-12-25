@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { useTransactions } from '../context/TransactionContext';
 import TransactionForm from '../components/TransactionForm';
 import PDFUploader from '../components/PDFUploader';
-import { Trash2, TrendingUp, TrendingDown, Upload } from 'lucide-react';
+import { Trash2, TrendingUp, TrendingDown, Upload, Plus, FileText, Calendar, Tag } from 'lucide-react';
 import { clsx } from 'clsx';
+import { formatCurrency } from '../utils/format';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Transactions: React.FC = () => {
   const { transactions, deleteTransaction } = useTransactions();
@@ -11,72 +13,109 @@ const Transactions: React.FC = () => {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-white">Transactions</h2>
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-8"
+    >
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <div>
+            <h2 className="text-3xl font-bold text-white mb-1">Transactions</h2>
+            <p className="text-slate-400">Manage and track your financial entries</p>
+        </div>
         <div className="flex gap-3">
-          <button 
+          <motion.button 
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setIsUploadOpen(true)}
-            className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors font-medium flex items-center gap-2"
+            className="px-5 py-2.5 bg-[#151921] hover:bg-[#1E232F] text-slate-300 hover:text-white border border-white/10 rounded-xl transition-all font-medium flex items-center gap-2 shadow-lg hover:shadow-xl hover:border-white/20"
           >
             <Upload size={18} />
             <span className="hidden sm:inline">Import PDF</span>
-          </button>
-          <button 
+          </motion.button>
+          <motion.button 
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setIsFormOpen(true)}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors font-medium"
+            className="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-black font-semibold rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-emerald-500/20"
           >
+            <Plus size={18} />
             Add Transaction
-          </button>
+          </motion.button>
         </div>
       </div>
 
-      <div className="rounded-xl bg-dark-card border border-slate-800 overflow-hidden">
+      <div className="rounded-2xl bg-[#151921]/80 backdrop-blur-xl border border-white/5 overflow-hidden shadow-xl">
         {transactions.length === 0 ? (
-          <div className="p-8 text-center text-dark-muted">
-            No transactions found. Add one manually or upload a statement.
+          <div className="p-12 text-center flex flex-col items-center justify-center">
+            <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4 text-slate-500">
+                <FileText size={32} />
+            </div>
+            <h3 className="text-lg font-medium text-white mb-2">No transactions yet</h3>
+            <p className="text-slate-400 max-w-sm mx-auto">
+              Get started by adding a transaction manually or importing your monthly Google Pay statement.
+            </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-slate-400">
-              <thead className="bg-slate-800/50 text-slate-200 uppercase font-medium">
+              <thead className="bg-white/5 text-slate-300 uppercase font-semibold text-xs tracking-wider">
                 <tr>
-                  <th className="px-6 py-4">Date</th>
-                  <th className="px-6 py-4">Description</th>
-                  <th className="px-6 py-4">Category</th>
-                  <th className="px-6 py-4">Amount</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
+                  <th className="px-6 py-5">
+                    <div className="flex items-center gap-2">
+                        <Calendar size={14} />
+                        Date
+                    </div>
+                  </th>
+                  <th className="px-6 py-5">Description</th>
+                  <th className="px-6 py-5">
+                    <div className="flex items-center gap-2">
+                        <Tag size={14} />
+                        Category
+                    </div>
+                  </th>
+                  <th className="px-6 py-5">Amount</th>
+                  <th className="px-6 py-5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800">
-                {transactions.map((transaction) => (
-                  <tr key={transaction.id} className="hover:bg-slate-800/30 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap">{transaction.date}</td>
-                    <td className="px-6 py-4 font-medium text-white">{transaction.description}</td>
-                    <td className="px-6 py-4">
-                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
-                        {transaction.category}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className={clsx(
-                        "flex items-center gap-1 font-bold",
-                        transaction.type === 'income' ? "text-green-400" : "text-red-400"
-                      )}>
-                        {transaction.type === 'income' ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
-                        ${transaction.amount.toFixed(2)}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <button 
-                        onClick={() => deleteTransaction(transaction.id)}
-                        className="text-slate-500 hover:text-red-400 transition-colors"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+              <tbody className="divide-y divide-white/5">
+                <AnimatePresence>
+                  {transactions.map((transaction) => (
+                    <motion.tr 
+                      key={transaction.id} 
+                      layout
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="group hover:bg-white/[0.02] transition-colors"
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap font-mono text-slate-300">{transaction.date}</td>
+                      <td className="px-6 py-4 font-medium text-white">{transaction.description}</td>
+                      <td className="px-6 py-4">
+                        <span className="px-3 py-1 rounded-full text-xs font-medium bg-white/5 text-slate-300 border border-white/10">
+                          {transaction.category}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className={clsx(
+                          "flex items-center gap-1.5 font-bold font-mono tracking-tight",
+                          transaction.type === 'income' ? "text-emerald-400" : "text-red-400"
+                        )}>
+                          {transaction.type === 'income' ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
+                          {formatCurrency(transaction.amount)}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <button 
+                          onClick={() => deleteTransaction(transaction.id)}
+                          className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </td>
+                    </motion.tr>
+                  ))}
+                </AnimatePresence>
               </tbody>
             </table>
           </div>
@@ -85,7 +124,7 @@ const Transactions: React.FC = () => {
 
       {isFormOpen && <TransactionForm onClose={() => setIsFormOpen(false)} />}
       {isUploadOpen && <PDFUploader onClose={() => setIsUploadOpen(false)} />}
-    </div>
+    </motion.div>
   );
 };
 
