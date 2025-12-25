@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Upload, FileText, Loader2, AlertCircle, X, ShieldCheck } from 'lucide-react';
-import { parseGooglePayPDF } from '../utils/pdfParser';
+import { parsePDF } from '../utils/pdfParser';
 import { useTransactions } from '../context/TransactionContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -22,10 +22,10 @@ const PDFUploader: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     setError(null);
 
     try {
-      const parsedTransactions = await parseGooglePayPDF(file);
+      const parsedTransactions = await parsePDF(file);
       
       if (parsedTransactions.length === 0) {
-        setError('No transactions found in the PDF. Please check the format.');
+        setError('No transactions found in the PDF. Please ensure you uploaded a valid Google Pay or HDFC Bank statement.');
         setLoading(false);
         return;
       }
@@ -34,14 +34,15 @@ const PDFUploader: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         id: crypto.randomUUID(),
         ...t,
         category: 'Uncategorized', // Default category
-        source: 'gpay-pdf' as const
       }));
 
       addTransactions(newTransactions);
+      
+      // Short delay to show success state if desired, or close immediately
       onClose();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setError('Failed to parse PDF. Ensure it is a valid Google Pay statement.');
+      setError(err.message || 'Failed to parse PDF. Please try a different file.');
     } finally {
       setLoading(false);
     }
@@ -80,9 +81,9 @@ const PDFUploader: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               <Upload size={32} />
             </div>
             
-            <h3 className="text-xl font-bold text-white mb-2">Upload Google Pay PDF</h3>
+            <h3 className="text-xl font-bold text-white mb-2">Upload Statement PDF</h3>
             <p className="text-slate-400 text-sm mb-8 leading-relaxed">
-              Upload your monthly transaction statement to automatically import your expenses and income.
+              Supports <strong>Google Pay</strong> transaction history and <strong>HDFC Bank</strong> statements.
             </p>
 
             <label className="block w-full cursor-pointer">
@@ -90,7 +91,7 @@ const PDFUploader: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 {loading ? (
                   <div className="flex flex-col items-center gap-3">
                     <Loader2 className="animate-spin text-emerald-500" size={36} />
-                    <span className="text-emerald-400 font-medium">Processing transactions...</span>
+                    <span className="text-emerald-400 font-medium">Processing statement...</span>
                   </div>
                 ) : (
                   <div className="flex flex-col items-center gap-3">
@@ -99,7 +100,7 @@ const PDFUploader: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                       <p className="text-slate-300 font-medium group-hover:text-white transition-colors">
                         Click to browse file
                       </p>
-                      <p className="text-xs text-slate-500">Supports PDF format only</p>
+                      <p className="text-xs text-slate-500">PDF files only</p>
                     </div>
                   </div>
                 )}

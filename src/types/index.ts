@@ -5,7 +5,7 @@ export interface Transaction {
   description: string;
   category: string;
   type: 'income' | 'expense';
-  source: 'manual' | 'gpay-pdf';
+  source: 'manual' | 'gpay' | 'hdfc' | 'gpay-pdf' | 'unknown';
 }
 
 export interface MonthlyStats {
